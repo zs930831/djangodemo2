@@ -16,12 +16,12 @@ def busniess(request):
     v3 = models.Business.objects.all().values_list("id", "caption")
     return render(request, "business.html", {"v1": v1, "v2": v2, "v3": v3})
 
-
 def host(request):
     if request.method == "GET":
         obj = models.Host.objects.filter(nid__gt=0)
         # 用双下划线去执行跨表取的操作
         obj1 = models.Host.objects.all().values("nid", "hostname", "b_id", "b__caption")
+        #元组obj2
         obj2 = models.Host.objects.all().values_list("nid", "hostname", "b_id", "b__caption")
         b_list = models.Business.objects.all()
         return render(request, "host.html", {"obj": obj, 'obj1': obj1, 'obj2': obj2, 'b_list': b_list})
