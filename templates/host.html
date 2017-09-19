@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Host</title>
+    <style>
+        .hide {
+            display: none;
+        }
+
+        .shade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: black;
+            opacity: 0.6;
+            z-index: 100;
+        }
+
+        .add_model, .edit-model {
+            position: fixed;
+            height: 300px;
+            width: 300px;
+            top: 100px;
+            left: 50%;
+            z-index: 101;
+            border: 1px solid red;
+            background: white;
+            margin-left: -200px;
+        }
+    </style>
+</head>
+<body>
+<h1>主机列表（对象）</h1>
+<div>
+    <input id="add_host" type="button" value="ADD!">
+</div>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>主机名</th>
+        <th>Ip</th>
+        <th>端口号</th>
+        <th>业务线名称</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in obj %}
+        <!-- 隐藏主机id，和业务线id-->
+        <tr hid="{{ row.nid }}" bid="{{ row.b_id }}">
+            <td>{{ forloop.counter0 }}</td>
+            <td>{{ row.hostname }}</td>
+            <td>{{ row.ip }}</td>
+            <td>{{ row.port }}</td>
+            <td>{{ row.b.caption }}</td>
+            <td>
+                <a class="edit">编辑</a>|<a class="delete">删除</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h1>主机列表（字典）</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>主机名</th>
+        <th>业务线名称</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in obj1 %}
+        <!-- 隐藏主机id，和业务线id-->
+        <tr h_id="{{ row.nid }}" b_id="{{ row.b_id }}">
+            <td>{{ forloop.revcounter0 }}</td>
+            <td>{{ row.hostname }}</td>
+            <td>{{ row.b__caption }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h1>主机列表（元组）</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>主机名</th>
+        <th>业务线名称</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in obj2 %}
+        <!-- 隐藏主机id，和业务线id-->
+        <tr h_id="{{ row.0 }}" b_id="{{ row.2 }}">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ row.1 }}</td>
+            <td>{{ row.3 }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<div class="shade hide"></div>
+<div class="add_model hide">
+    <form id="add_form" method="post" action="/host/">
+        <div class="group">
+            <input id="host" type="text" placeholder="主机名" name="hostname"/>
+        </div>
+
+        <div class="group">
+            <input id="ip" type="text" placeholder="IP" name="ip"/>
+        </div>
+
+        <div class="group">
+            <input id="port" type="text" placeholder="端口" name="port"/>
+        </div>
+
+        <div class="group">
+            <select id="sel" name="b_id">
+                {% for op in b_list %}
+                    <option value="{{ op.id }}">{{ op.caption }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <input type="submit" value="提交"/>
+        <a id="ajax_submit">悄悄提交</a>
+        <input id="cancel" type="button" value="取消"/>
+        <span id="erro_msg" style="color: red"></span>
+    </form>
+</div>
+<div class="edit-model hide">
+    <form id="edit_form" method="POST" action="/host">
+        <input type="text" name="nid" style="display: none"/>
+        <input type="text" placeholder="主机名" name="hostname"/>
+        <input type="text" placeholder="IP" name="ip"/>
+        <input type="text" placeholder="端口" name="port"/>
+        <select name="b_id">
+            {% for op in b_list %}
+                <option value="{{ op.id }}">{{ op.caption }}</option>
+            {% endfor %}
+        </select>
+        <a id="ajax_submit_edit">确认编辑</a>
+    </form>
+
+
+</div>
+<script src="/static/jquery-1.12.4.js"></script>
+<script>
+    $(function () {
+        //id用#,class用.
+        $("#add_host").click(function () {
+            $('.shade,.add_model').removeClass('hide')
+        })
+    });
+    $('#cancel').click(function () {
+        $('.shade,.add-modal').addClass('hide');
+    });
+    $("#ajax_submit").click(function () {
+            $.ajax(
+                {
+                    url: "/ajaxtest",
+                    type: "post",
+                    {#                    data: {#}
+                    {#                        'hostname': $('#host').val(),#}
+                    {#                        'ip': $('#ip').val(),#}
+                    {#                        'port': $('#port').val(),#}
+                    {#                        'b_id': $('#sel').val()#}
+                    {#                    },#}
+                    data: $("#add_form").serialize(),
+                    success: function (data) {
+                        var ret = JSON.parse(data);
+                        if (ret.status == 200) {
+                            location.reload();
+                        }
+                        else {
+                            $('#erro_msg').text(ret.error);
+                        }
+                    }
+
+                }
+            )
+        }
+    );
+    $('#ajax_submit_edit').click(function () {
+        $.ajax(
+            {
+                url: '/ajaxtest1',
+                type: "post",
+                data: $("#edit_form").serialize(),
+                success: function (data) {
+                    var ret1 = JSON.parse(data);
+                    if (ret1.status == 200) {
+                        location.reload();
+                    }
+                    else {
+                        alert(ret1.error)
+                    }
+                }
+            }
+        )
+    });
+    $(".edit").click(function () {
+        $('.shade,.edit-model').removeClass('hide');
+        var bid = $(this).parent().parent().attr('bid');
+        var hid = $(this).parent().parent().attr("hid");
+        $('#edit_form').find('select').val(bid);
+        $('#edit_form').find('input[name="nid"]').val(hid);
+    })
+
+</script>
+</body>
+</html>

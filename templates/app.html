@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App</title>
+    <style>
+        .td-dec {
+            background-color: antiquewhite;
+            border: 1px solid red;
+        {#            display: inline-block;#} padding: 3px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .shade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: black;
+            opacity: 0.6;
+            z-index: 100;
+        }
+
+        .add-model {
+            position: fixed;
+            height: 300px;
+            width: 300px;
+            top: 100px;
+            left: 50%;
+            z-index: 101;
+            border: 1px solid red;
+            background: white;
+            margin-left: -200px;
+        }
+    </style>
+
+</head>
+<body>
+<h1>应用</h1>
+<div>
+    <!--id只能用一次"#" ，class可以多次使用 "."-->
+    <input id="add_button" type="button" value="添加">
+</div>
+<table border="1px">
+    <thead>
+    <tr>
+        <th>应用名</th>
+        <th>主机名</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for app in applist %}
+        <tr>
+            <td>{{ app.name }}</td>
+            <td class="td-dec">
+                {% for app1 in app.r.all %}
+                    <span>{{ app1.hostname }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<div class="shade hide"></div>
+<div class="add-model hide">
+    <form id="add_form" method="POST" action="/app">
+        <div class="group">
+           <input type="text" name="appname" placeholder="name"/>
+        </div>
+        <div class="group">
+            <label>
+                <select name="hostlist" multiple>
+                    {% for host in hostlist %}
+                    <option value="{{ host.nid }}">{{ host.hostname }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+        <input type="submit" value="提交"/>
+        <input id="add_submit_ajax" type="button" value="Ajax提交" />
+        <span id="erro_msg" style="color: red"></span>
+    </form>
+</div>
+<script src="/static/jquery-1.12.4.js"></script>
+<script>
+    $(function () {
+        $("#add_button").click(function () {
+            $(".add-model,.shade").removeClass("hide");
+        });
+        $('#add_submit_ajax').click(function () {
+            $.ajax({
+                url:'ajax_app',
+                type:"post",
+                data:$('#add_form').serialize(),
+                success:function (data) {
+                   var data=JSON.parse(data);
+                    if(data.status==200){
+                        location.reload();
+                    }
+                    else{
+                        $('#erro_msg').text(data.error)
+                    }
+                },
+                error:function () {
+                    alert("出错了！");
+                }
+            })
+        })
+    })
+</script>
+</body>
+</html>
