@@ -39,7 +39,7 @@ def fm(request):
         # 从数据库中吧数据获取到
         dic = {
             "user": 'r1',
-            'pwd': '123123',
+            'pwd': '123dd123',
             'email': 'sdfsd',
             'city1': 1,
             'city2': [1,2]
