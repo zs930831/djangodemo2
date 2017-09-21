@@ -5,6 +5,7 @@ from django.db import models
 #     name = models.CharField(max_length=1)
 
 
+
 class Business(models.Model):
     # id
     caption = models.CharField(max_length=32)
@@ -27,4 +28,7 @@ class Application(models.Model):
 #     aobj = models.ForeignKey(to='Application',to_field='id')
 
 # hid: 1~10  aid:1~2
-
+class UserInfo(models.Model):
+    user=models.CharField(max_length=32)
+    pwd=models.CharField(max_length=32)
+    email=models.EmailField(max_length=32)

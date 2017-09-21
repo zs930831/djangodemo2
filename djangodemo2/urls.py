@@ -24,4 +24,6 @@ urlpatterns = [
     url(r'^ajaxtest1$', views.test1),
     url(r'^app$', views.app),
     url(r'^ajax_app$', views.ajax_app),
+    url(r'^sg/', views.sg),
+    url(r'^fm/', views.fm),
 ]
